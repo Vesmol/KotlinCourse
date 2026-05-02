@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_title">My Shopping List</string>
+    <string name="input_label">Product name</string>
+    <string name="add_button">Add</string>
+    <string name="delete_desc">Delete product</string>
+    <plurals name="items_count">
+        <item quantity="one">%1$d item</item>
+        <item quantity="other">%1$d items</item>
+    </plurals>
+</resources>

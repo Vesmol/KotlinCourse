@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_title">Мой список покупок</string>
+    <string name="input_label">Название продукта</string>
+    <string name="add_button">Добавить</string>
+    <string name="delete_desc">Удалить продукт</string>
+    <plurals name="items_count">
+        <item quantity="one">%1$d штука</item>
+        <item quantity="few">%1$d штуки</item>
+        <item quantity="other">%1$d штук</item>
+    </plurals>
+</resources>
