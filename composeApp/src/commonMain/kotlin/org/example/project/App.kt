@@ -12,6 +12,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.pluralStringResource
 import kotlinproject.composeapp.generated.resources.*
@@ -21,6 +22,7 @@ data class ShoppingListItem(
     val bought: Boolean = false
 )
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun App() {
     val shoppingList = remember {
@@ -31,38 +33,54 @@ fun App() {
         )
     }
     var newItemDesc by remember { mutableStateOf("") }
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
 
-    // Поддержка светлой/тёмной темы
+    var deleteItemIndex by remember { mutableStateOf<Int?>(null) }
+    val itemToDelete = deleteItemIndex?.let { shoppingList[it] }
+
     MaterialTheme(
         colorScheme = if (isSystemInDarkTheme()) darkColorScheme() else lightColorScheme()
     ) {
-        Surface(modifier = Modifier.fillMaxSize()) {
-            Column(modifier = Modifier.fillMaxWidth()) {
-                Text(
-                    text = stringResource(Res.string.app_title),
-                    style = MaterialTheme.typography.headlineMedium,
-                    modifier = Modifier.padding(16.dp)
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text(stringResource(Res.string.app_title)) },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
                 )
-
+            },
+            snackbarHost = { SnackbarHost(snackbarHostState) }
+        ) { innerPadding ->
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(innerPadding)
+                    .padding(horizontal = 16.dp)
+            ) {
                 Text(
                     text = pluralStringResource(Res.plurals.items_count, shoppingList.size, shoppingList.size),
-                    modifier = Modifier.padding(horizontal = 16.dp),
+                    modifier = Modifier.padding(bottom = 8.dp),
                     style = MaterialTheme.typography.bodyMedium
                 )
 
-                LazyColumn(modifier = Modifier.fillMaxSize()) {
+                LazyColumn {
                     item {
                         OutlinedTextField(
                             value = newItemDesc,
                             onValueChange = { newItemDesc = it },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
+                            modifier = Modifier.fillMaxWidth(),
                             label = { Text(stringResource(Res.string.input_label)) },
                             trailingIcon = {
                                 IconButton(onClick = {
                                     if (newItemDesc.isNotBlank()) {
-                                        shoppingList.add(ShoppingListItem(newItemDesc.trim()))
+                                        val newItem = ShoppingListItem(newItemDesc.trim())
+                                        shoppingList.add(newItem)
+                                        scope.launch {
+                                            snackbarHostState.showSnackbar("Добавлено: ${newItem.description}")
+                                        }
                                         newItemDesc = ""
                                     }
                                 }) {
@@ -70,18 +88,45 @@ fun App() {
                                 }
                             }
                         )
+                        Spacer(modifier = Modifier.height(8.dp))
                     }
 
                     itemsIndexed(shoppingList) { index, item ->
                         ShoppingListElement(
                             item = item,
                             onBoughtChange = { shoppingList[index] = item.copy(bought = it) },
-                            onDelete = { shoppingList.removeAt(index) }
+                            onDelete = { deleteItemIndex = index }
                         )
                     }
                 }
             }
         }
+    }
+
+    if (itemToDelete != null) {
+        AlertDialog(
+            onDismissRequest = { deleteItemIndex = null },
+            title = { Text("Удаление") },
+            text = { Text("Удалить \"${itemToDelete.description}\"?") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        scope.launch {
+                            snackbarHostState.showSnackbar("Удалено: ${itemToDelete.description}")
+                        }
+                        shoppingList.removeAt(deleteItemIndex!!)
+                        deleteItemIndex = null
+                    }
+                ) {
+                    Text("Удалить")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { deleteItemIndex = null }) {
+                    Text("Отмена")
+                }
+            }
+        )
     }
 }
 
@@ -95,7 +140,7 @@ fun ShoppingListElement(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 4.dp)
+            .padding(vertical = 4.dp)
     ) {
         Checkbox(
             checked = item.bought,
