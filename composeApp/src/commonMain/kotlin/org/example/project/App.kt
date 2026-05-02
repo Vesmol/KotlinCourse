@@ -1,5 +1,6 @@
 package org.example.project
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -31,7 +32,10 @@ fun App() {
     }
     var newItemDesc by remember { mutableStateOf("") }
 
-    MaterialTheme {
+    // Поддержка светлой/тёмной темы
+    MaterialTheme(
+        colorScheme = if (isSystemInDarkTheme()) darkColorScheme() else lightColorScheme()
+    ) {
         Surface(modifier = Modifier.fillMaxSize()) {
             Column(modifier = Modifier.fillMaxWidth()) {
                 Text(
