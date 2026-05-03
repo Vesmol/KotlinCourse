@@ -7,6 +7,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -24,7 +25,10 @@ data class ShoppingListItem(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(onNavigateToSecond: (String) -> Unit) {
+fun HomeScreen(
+    onNavigateToSecond: (String) -> Unit,
+    onNavigateToLocation: () -> Unit
+) {
     val shoppingList = remember {
         mutableStateListOf(
             ShoppingListItem("Молоко"),
@@ -54,6 +58,9 @@ fun HomeScreen(onNavigateToSecond: (String) -> Unit) {
                             onNavigateToSecond(info)
                         }) {
                             Icon(Icons.Default.Info, contentDescription = "О приложении")
+                        }
+                        IconButton(onClick = onNavigateToLocation) {
+                            Icon(Icons.Default.MyLocation, contentDescription = "Геолокация")
                         }
                     }
                 )

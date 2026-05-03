@@ -23,6 +23,7 @@ kotlin {
         androidMain.dependencies {
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.androidx.activity.compose)
+            implementation("com.google.android.gms:play-services-location:21.0.1")
         }
         commonMain.dependencies {
             implementation(libs.compose.runtime)

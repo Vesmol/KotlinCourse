@@ -6,7 +6,8 @@ import kotlinx.coroutines.launch
 
 enum class Screen {
     HOME,
-    SECOND
+    SECOND,
+    LOCATION
 }
 
 @Composable
@@ -28,6 +29,9 @@ fun App(preferencesManager: IPreferencesManager) {
                 onNavigateToSecond = { data ->
                     sharedData = data
                     currentScreen = Screen.SECOND
+                },
+                onNavigateToLocation = {
+                    currentScreen = Screen.LOCATION
                 }
             )
             Screen.SECOND -> SecondScreen(
@@ -38,6 +42,9 @@ fun App(preferencesManager: IPreferencesManager) {
                         preferencesManager.saveLastPostId(id)
                     }
                 }
+            )
+            Screen.LOCATION -> LocationScreen(
+                onBack = { currentScreen = Screen.HOME }
             )
         }
     }
