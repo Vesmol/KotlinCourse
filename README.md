@@ -1,40 +1,29 @@
-This is a Kotlin Multiplatform project targeting Android, Desktop (JVM).
+# Kotlin Multiplatform Course Project
 
-* [/composeApp](./composeApp/src) is for code that will be shared across your Compose Multiplatform applications.
-  It contains several subfolders:
-  - [commonMain](./composeApp/src/commonMain/kotlin) is for code that’s common for all targets.
-  - Other folders are for Kotlin code that will be compiled for only the platform indicated in the folder name.
-    For example, if you want to use Apple’s CoreCrypto for the iOS part of your Kotlin app,
-    the [iosMain](./composeApp/src/iosMain/kotlin) folder would be the right place for such calls.
-    Similarly, if you want to edit the Desktop (JVM) specific part, the [jvmMain](./composeApp/src/jvmMain/kotlin)
-    folder is the appropriate location.
+Проект — результат последовательного выполнения лабораторных работ по курсу Kotlin Multiplatform (Android + Desktop).
 
-### Build and Run Android Application
+## Особенности
 
-To build and run the development version of the Android app, use the run configuration from the run widget
-in your IDE’s toolbar or build it directly from the terminal:
-- on macOS/Linux
-  ```shell
-  ./gradlew :composeApp:assembleDebug
-  ```
-- on Windows
-  ```shell
-  .\gradlew.bat :composeApp:assembleDebug
-  ```
+- Архитектура складывалась по ходу изучения тем.
+- В истории коммитов можно увидеть этапы: от базового Compose UI до навигации, интернет-запросов, DataStore, разрешений и релизной подписи.
+- Некоторые решения (например, навигация) выполнены без сторонних библиотек.
 
-### Build and Run Desktop (JVM) Application
+## Содержимое
 
-To build and run the development version of the desktop app, use the run configuration from the run widget
-in your IDE’s toolbar or run it directly from the terminal:
-- on macOS/Linux
-  ```shell
-  ./gradlew :composeApp:run
-  ```
-- on Windows
-  ```shell
-  .\gradlew.bat :composeApp:run
-  ```
+- `commonMain` – общая логика: экраны, Ktor-клиент, интерфейс для настроек, навигация через состояние.
+- `androidMain` – Android-реализации: PreferencesManager, запрос разрешений (геолокация), точка входа.
+- `jvmMain` – Desktop-заглушки для кроссплатформенных вызовов.
+- `composeResources` – строковые ресурсы (русский/английский).
 
----
+## Запуск
 
-Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html)…
+**Android (отладка)**
+**Desktop (JVM)**
+**Релизный APK**
+Находится в `composeApp/build/outputs/apk/release/`.
+
+## Замечания
+
+- Для работы геолокации на старых устройствах может потребоваться наличие Google Play Services.
+- При первом запуске на Android приложение запросит разрешение на определение местоположения.
+- Desktop-версия использует заглушки; сохранение настроек и реальные координаты не поддерживаются.
