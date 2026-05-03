@@ -1,21 +1,43 @@
 package org.example.project
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SecondScreen(onBack: () -> Unit) {
+fun SecondScreen(
+    onBack: () -> Unit,
+    initialPostId: Int = 1,
+    onSavePostId: (Int) -> Unit = {}
+) {
     var post by remember { mutableStateOf<Post?>(null) }
     var isLoading by remember { mutableStateOf(false) }
+    var postId by remember { mutableStateOf(initialPostId) }
     val scope = rememberCoroutineScope()
+
+    LaunchedEffect(Unit) {
+        if (initialPostId > 0) {
+            scope.launch {
+                isLoading = true
+                try {
+                    post = NetworkService.fetchPost(initialPostId)
+                } catch (e: Exception) {
+                    post = null
+                } finally {
+                    isLoading = false
+                }
+            }
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -49,17 +71,30 @@ fun SecondScreen(onBack: () -> Unit) {
                     }
                 }
             } else {
-                Text("Нажмите кнопку, чтобы загрузить пост", style = MaterialTheme.typography.bodyLarge)
+                Text("Введите ID и нажмите кнопку", style = MaterialTheme.typography.bodyLarge)
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            OutlinedTextField(
+                value = postId.toString(),
+                onValueChange = { newId ->
+                    newId.toIntOrNull()?.let { postId = it }
+                },
+                label = { Text("ID поста") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                modifier = Modifier.fillMaxWidth(0.6f)
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
             Button(
                 onClick = {
                     scope.launch {
+                        onSavePostId(postId)
                         isLoading = true
                         try {
-                            post = NetworkService.fetchPost(1)
+                            post = NetworkService.fetchPost(postId)
                         } catch (e: Exception) {
                             post = null
                         } finally {
@@ -68,7 +103,7 @@ fun SecondScreen(onBack: () -> Unit) {
                     }
                 }
             ) {
-                Text("Загрузить пост")
+                Text("Загрузить пост #$postId")
             }
         }
     }
