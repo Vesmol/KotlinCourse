@@ -22,7 +22,6 @@ fun App() {
                 }
             )
             Screen.SECOND -> SecondScreen(
-                data = sharedData,
                 onBack = { currentScreen = Screen.HOME }
             )
         }
